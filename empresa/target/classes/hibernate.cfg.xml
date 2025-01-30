@@ -47,6 +47,8 @@
         <mapping class="com.iticbcn.christopherflores.model.Empresa"/>
         <mapping class="com.iticbcn.christopherflores.model.Departament"/>
         <mapping class="com.iticbcn.christopherflores.model.Empleat"/>
+        <mapping class="com.iticbcn.christopherflores.model.Tasca"/>
+        <mapping class="com.iticbcn.christopherflores.model.Historic"/>
       
     </session-factory>
 </hibernate-configuration>

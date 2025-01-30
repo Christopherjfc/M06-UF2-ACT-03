@@ -26,7 +26,7 @@ public class Empresa {
     @Column
     private String direccion;
 
-    // EMPRESA -> TIENE MUCHoS -> DEPARTAMENTOS 
+    // EMPRESA -> TIENE MUCHOS -> DEPARTAMENTOS 
     @OneToMany (mappedBy = "empresa", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Departament> departaments;
 
