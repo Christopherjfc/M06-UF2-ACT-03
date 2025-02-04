@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.iticbcn.christopherflores.model.Departament" table="Departament">
+        <id column="idDepartament" name="idDepartament" type="int">
+            <generator class="identity"/>
+        </id>
+        <property column="nomDepartament" name="nomDepartament" type="string"/>
+        <set name="empleats" inverse="true" cascade="persist" fetch="lazy">
+            <key column="departament_id"/>
+            <one-to-many class="com.iticbcn.christopherflores.model.Empleat"/>
+        </set>
+    </class>
+</hibernate-mapping>
