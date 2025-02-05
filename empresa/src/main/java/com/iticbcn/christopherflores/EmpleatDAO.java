@@ -79,7 +79,7 @@ public class EmpleatDAO {
             String dni = entrada.readLine();
             System.out.print("Correo> ");
             String correu = entrada.readLine();
-            System.out.print("telefon> ");
+            System.out.print("teléfono> ");
             String telefon = entrada.readLine();
             
             Empleat empleat = new Empleat(nomEmpleat, dni, correu, telefon, departament);

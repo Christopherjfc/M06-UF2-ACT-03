@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Tasca {
@@ -25,6 +26,12 @@ public class Tasca {
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY,mappedBy = "tasca")
     private Set<Empleat> empleat = new HashSet<>();
 
+    @OneToMany 
+    (mappedBy = "tasca", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private Set<Historic> historics;
+
+
+    public Tasca() {}
     public Tasca(String nomTasca, String descripcio) {
         this.nomTasca = nomTasca;
         this.descripcio = descripcio;
@@ -69,4 +76,17 @@ public class Tasca {
         this.empleat = empleat;
     }
 
+    public Set<Historic> getHistorics() {
+        return historics;
+    }
+
+    public void setHistorics(Set<Historic> historics) {
+        this.historics = historics;
+    }
+    @Override
+    public String toString() {
+        return "ID=" + idTasca + ", Título=" + nomTasca + ", Descripción=" + descripcio;
+    }
+
+    
 }

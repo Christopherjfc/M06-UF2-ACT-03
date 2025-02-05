@@ -45,4 +45,11 @@ public class Departament implements Serializable{
     public void setNomDepartament(String nomDepartament) {
         this.nomDepartament = nomDepartament;
     }
+
+    @Override
+    public String toString() {
+        return "ID=" + idDepartament + ", Nombre=" + nomDepartament;
+    }
+
+    
 }
