@@ -5,9 +5,9 @@
         <id column="idDepartament" name="idDepartament" type="int">
             <generator class="identity"/>
         </id>
-        <property column="nomDepartament" name="nomDepartament" type="string"/>
+        <property column="nomDepartament" name="nomDepartament" type="string" unique="true"/>
         <set name="empleats" inverse="true" cascade="persist" fetch="lazy">
-            <key column="departament_id"/>
+            <key column="idDepartament"/>
             <one-to-many class="com.iticbcn.christopherflores.model.Empleat"/>
         </set>
     </class>

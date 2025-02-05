@@ -42,6 +42,8 @@ public class Empleat {
     inverseJoinColumns = {@JoinColumn(name="idTasca", foreignKey = @ForeignKey(name="FK_EMPTAR_TASCA"))}) 
     private Set<Tasca> tasca = new HashSet<>();
 
+    public Empleat () {}
+
     public Empleat(String nomEmpleat, String dni, String correu, String telefon, Departament departament) {
         this.nomEmpleat = nomEmpleat;
         this.dni = dni;
@@ -113,4 +115,11 @@ public class Empleat {
         this.tasca = tasca;
     }
 
+    @Override
+    public String toString() {
+        return "ID=" + idEmpleat + ", Nombre=" + nomEmpleat + ", DNI=" + dni + ", Correo=" + correu
+                + ", Teléfono=" + telefon + ", Departament=" + departament.getIdDepartament();
+    }
+
+    
 }

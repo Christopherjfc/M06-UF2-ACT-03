@@ -96,11 +96,12 @@ public class Main {
             try (BufferedReader entrada = new BufferedReader(new InputStreamReader(System.in))) {
                 muestraTablas();
                 boolean confirma = true;
+                String opcion;
                 while (confirma) {
                     System.out.print("CJ_HIBERNATE> ");
-                    String orden = entrada.readLine().strip();
-                    if (orden.isEmpty()) continue;
-                    switch (orden) {
+                    opcion = entrada.readLine().strip();
+                    if (opcion.isEmpty()) continue;
+                    switch (opcion) {
                         case "1":
                             DepartamentDAO.opcionesDepartament(sf, entrada);
                             muestraTablas();

@@ -2,10 +2,12 @@ package com.iticbcn.christopherflores;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 
 import com.iticbcn.christopherflores.model.Departament;
 
@@ -14,11 +16,12 @@ public class DepartamentDAO {
     public static void opcionesDepartament(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
         muestraOpciones();
         boolean confirma = true;
+        String opcion;
         while (confirma) {
             System.out.print("CJ_HIBERNATE> ");
-            String orden = entrada.readLine().strip();
-            if (orden.isEmpty()) continue;
-            switch (orden) {
+            opcion = entrada.readLine().strip();
+            if (opcion.isEmpty()) continue;
+            switch (opcion) {
                 case "1":registraDepartament(sf, entrada);
                     muestraOpciones();
                     break;
@@ -86,7 +89,7 @@ public class DepartamentDAO {
         Session session = null;
         try {
             session = sf.openSession();
-            System.out.println("Introduce la ID del departamento que deseas consultar:");
+            muestrasAllDepartaments(session);
             Departament departament = encuentraDepartamentPorID(session, entrada);
 
             System.out.println("\n El nombre del departamento es: " + departament.getNomDepartament());
@@ -107,11 +110,14 @@ public class DepartamentDAO {
         try {
             session = sf.openSession();
             session.beginTransaction();
+
+            muestrasAllDepartaments(session);
     
             Departament departament = encuentraDepartamentPorID(session, entrada);
-    
+            System.out.println("Para salir escriba 'q'");
             System.out.print("Nuevo nombre del departamento: ");
             String nuevoNombre = entrada.readLine();
+            if (nuevoNombre.equals("q")) return;
             departament.setNomDepartament(nuevoNombre);
     
             session.merge(departament);
@@ -135,6 +141,8 @@ public class DepartamentDAO {
         try {
             session = sf.openSession();
             session.beginTransaction();
+
+            muestrasAllDepartaments(session);
     
             Departament departament = encuentraDepartamentPorID(session, entrada);
     
@@ -180,5 +188,25 @@ public class DepartamentDAO {
             }
         }
         return departament;
+    }
+
+    public static void muestrasAllDepartaments(Session session) {
+        try {
+            Query<Departament> query = session.createQuery("from Departament", Departament.class);
+            List<Departament> departaments = query.list();
+    
+            if (departaments.isEmpty()) {
+                System.out.println("No hay departamentos registrados.");
+            } else {
+                System.out.println("Departamentos disponibles:");
+                System.out.println();
+                for (Departament d : departaments) {
+                    System.out.println("ID: " + d.getIdDepartament() + " | Nombre: " + d.getNomDepartament());
+                }
+                System.out.println();
+            }
+        } catch (HibernateException e) {
+            System.out.println("Error Hibernate: " + e.getMessage());
+        }
     }
 }
