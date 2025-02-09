@@ -11,6 +11,7 @@ import org.hibernate.query.Query;
 
 import com.iticbcn.christopherflores.model.Departament;
 import com.iticbcn.christopherflores.model.Empleat;
+import com.iticbcn.christopherflores.model.Tasca;
 
 public class EmpleatDAO {
     
@@ -38,6 +39,8 @@ public class EmpleatDAO {
                 case "4":
                     eliminaEmpleat(sf, entrada);
                     muestraOpciones();
+                case "5":
+                    insertarTasca(sf, entrada);
                     break;
                 case "q":
                     confirma = false;
@@ -60,6 +63,7 @@ public class EmpleatDAO {
         2. ENCUENTRA EMPLEAT
         3. MODIFICA EMPLEAT
         4. ELIMINA EMPLEAT
+        5. AÑADIR TASCA A EMPLEAT
 
         Introduzca "q" para regresar hacia atrás.
         """);
@@ -118,7 +122,6 @@ public class EmpleatDAO {
             if (session != null) session.close();
         }
     }
-
     
     public static void modificaEmpleat(SessionFactory sf, BufferedReader entrada) throws IOException {
         Session session = null;
@@ -247,6 +250,36 @@ public class EmpleatDAO {
         }
     }
 
+    public static void insertarTasca(SessionFactory sf, BufferedReader entrada) throws IOException{
+        Session session = null;
+        try {
+            session = sf.openSession();
+            session.beginTransaction();
+            muestrasAllEmpleats(session);
+            System.out.println("Seleccione el empleado al que desea añadirle una tarea:");
+            Empleat empleat = encuentraEmpleatPorID(session, entrada);
+            TascaDAO.muestrasAllTascas(session);
+            System.out.println("Seleccione la tarea que desea añadirle al empleado " + empleat.getNomEmpleat());
+
+            Tasca tasca = TascaDAO.encuentraTascaPorID(session, entrada);
+
+            System.out.println("Insertando tarea....");
+
+            empleat.getTasca().add(tasca);
+
+            System.out.println("Tarea asignada con éxito.");
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            if (session.getTransaction() != null) session.getTransaction().rollback();
+            System.out.println("Error Hibernate: " + e.getMessage());
+        } catch (Exception e) {
+            if (session.getTransaction() != null) session.getTransaction().rollback();
+            System.out.println("Error inesperado: " + e.getMessage());
+        } finally {
+            if (session != null) session.close();
+        }
+    }    
+
     /*
      * MÉTODOS COMPLEMENTARIOS
      */
@@ -254,13 +287,13 @@ public class EmpleatDAO {
     public static Empleat encuentraEmpleatPorID(Session session, BufferedReader entrada) throws IOException {
         Empleat empleat = null;
         while (empleat == null) {
-            System.out.print("Introduzca la ID del departamento que desea obtener: ");
+            System.out.print("Introduzca la ID del empleado que desea obtener: ");
             try {
                 Integer id = Integer.parseInt(entrada.readLine());
                 empleat = session.find(Empleat.class, id);
     
                 if (empleat == null) {
-                    System.out.printf("El departamento con ID %d no existe.%n", id);
+                    System.out.printf("El Empleado con ID %d no existe.%n", id);
                 }
             } catch (NumberFormatException nfe) {
                 System.out.println("ERROR: introduzca un número entero.");

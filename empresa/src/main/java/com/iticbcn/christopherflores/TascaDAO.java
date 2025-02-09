@@ -8,6 +8,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+
+import com.iticbcn.christopherflores.model.Empleat;
 import com.iticbcn.christopherflores.model.Tasca;
 
 public class TascaDAO {
@@ -35,6 +37,8 @@ public class TascaDAO {
                 case "4":
                     eliminaTasca(sf, entrada);
                     muestraOpciones();
+                case "5":
+                    insertarEmpleat(sf, entrada);
                     break;
                 case "q":
                     confirma = false;
@@ -57,6 +61,7 @@ public class TascaDAO {
         2. ENCUENTRA TASCA
         3. MODIFICA TASCA
         4. ELIMINA TASCA
+        5. AÑADIR EMPLEADO A TASCA
 
         Introduzca "q" para regresar hacia atrás.
         """);
@@ -199,6 +204,36 @@ public class TascaDAO {
             if (session != null) session.close();
         }
     }
+
+    public static void insertarEmpleat(SessionFactory sf, BufferedReader entrada) throws IOException{
+        Session session = null;
+        try {
+            session = sf.openSession();
+            session.beginTransaction();
+            muestrasAllTascas(session);
+            System.out.println("Seleccione la tarea a la que desea añadirle una empleado:");
+            Tasca tasca = encuentraTascaPorID(session, entrada);
+            EmpleatDAO.muestrasAllEmpleats(session);
+            System.out.println("Seleccione el empleado que desea añadirle a la tarea " + tasca.getNomTasca());
+
+            Empleat empleat = EmpleatDAO.encuentraEmpleatPorID(session, entrada);
+
+            System.out.println("Insertando Empleado....");
+
+            empleat.getTasca().add(tasca);
+
+            System.out.println("Empleado asignado con éxito.");
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            if (session.getTransaction() != null) session.getTransaction().rollback();
+            System.out.println("Error Hibernate: " + e.getMessage());
+        } catch (Exception e) {
+            if (session.getTransaction() != null) session.getTransaction().rollback();
+            System.out.println("Error inesperado: " + e.getMessage());
+        } finally {
+            if (session != null) session.close();
+        }
+    }    
     
     
     public static Tasca encuentraTascaPorID(Session session, BufferedReader entrada) throws IOException {

@@ -27,7 +27,7 @@ public class Tasca {
     private Set<Empleat> empleat = new HashSet<>();
 
     @OneToMany 
-    (mappedBy = "tasca", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    (mappedBy = "tasca", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Historic> historics;
 
 
