@@ -10,6 +10,18 @@ public class Departament implements Serializable{
     private String nomDepartament;
     private Set<Empleat> empleats = new HashSet<>();
 
+    // constructor especifico
+    public Departament(){}
+    
+    // constructor parametrizado
+    public Departament(String nomDepartament) {
+        this.nomDepartament = nomDepartament;
+    }
+
+    public void addEmpleat(Empleat empleat){
+        empleats.add(empleat);
+    }
+    
     public Set<Empleat> getEmpleats() {
         return empleats;
     }
@@ -17,15 +29,6 @@ public class Departament implements Serializable{
     public void setEmpleats(Set<Empleat> empleats) {
         this.empleats = empleats;
     }
-
-    // constructor especifico
-    public Departament(){}
-
-    // constructor parametrizado
-    public Departament(String nomDepartament) {
-        this.nomDepartament = nomDepartament;
-    }
-
 
     public int getIdDepartament() {
         return idDepartament;

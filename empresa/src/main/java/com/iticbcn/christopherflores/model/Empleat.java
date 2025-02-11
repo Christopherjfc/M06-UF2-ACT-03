@@ -3,6 +3,9 @@ package com.iticbcn.christopherflores.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -17,23 +20,28 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "Empleat", uniqueConstraints = { @UniqueConstraint(columnNames = { "dni", "correu", "telefon" }) })
+@Table(name = "Empleat", uniqueConstraints = { 
+    @UniqueConstraint(columnNames = { "dni" }), 
+    @UniqueConstraint(columnNames = { "correu" }),
+    @UniqueConstraint(columnNames = { "telefon" }) 
+})
 public class Empleat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idEmpleat;
-    @Column
+    @Column(nullable = false)
     private String nomEmpleat;
-    @Column
+    @Column(nullable = false)
     private String dni;
-    @Column
+    @Column(nullable = false)
     private String correu;
-    @Column
+    @Column(nullable = false)
     private String telefon;
     
     // MUCHOS EMPLEADOS -> TIENEN SOLO 1 -> DEPARTAMENTO 
     @ManyToOne
-    @JoinColumn(name = "idDepartament", foreignKey = @ForeignKey(name = "FK_EMPL_DEPARTAMENT"), nullable = false)
+    @JoinColumn(name = "idDepartament", foreignKey = @ForeignKey(name = "FK_EMPL_DEPARTAMENT"), nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Departament departament;
 
     @ManyToMany

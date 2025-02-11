@@ -8,6 +8,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 import com.iticbcn.christopherflores.model.Historic;
 import com.iticbcn.christopherflores.model.Tasca;
@@ -16,6 +18,7 @@ public class HistoricDAO {
     
     public static void opcionesHistoric(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
         muestraOpciones();
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         boolean confirma = true;
         while (confirma) {
             System.out.print("CJ_HIBERNATE> ");
@@ -42,7 +45,7 @@ public class HistoricDAO {
                     confirma = false;
                     break;
                 default:
-                    System.out.println("\nOpción incorrecta, por favor:");
+                    printScreen(terminal, "Opción incorrecta, por favor:");
                     muestraOpciones();
                     break;
             }
@@ -53,7 +56,9 @@ public class HistoricDAO {
     public static void muestraOpciones() {
         System.out.println("""
 
-        TABLA HISTORIC:
+        ----------------
+         TABLA HISTORIC
+        ----------------
 
         1. CREA UN HISTORIC
         2. ENCUENTRA HISTORIC
@@ -64,24 +69,27 @@ public class HistoricDAO {
         """);
     }
 
-    public static void registraHistoric(SessionFactory sf, BufferedReader entrada) throws IOException{
+    public static void registraHistoric(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try {
             session = sf.openSession();
             session.beginTransaction();
-            System.out.println("Introduce la ID de una tarea para integrarla al Histórico:");
-            if (!TascaDAO.muestrasAllTascas(session)) return;
+            printScreen(terminal, "Introduce la ID de una tarea para integrarla al Histórico:");
+            if (!TascaDAO.muestrasAllTascas(session)) {
+                printScreen(terminal, "Debe crear una Tarea para poder gestionar la tabla Historic.");
+                return;
+            }
             Tasca tasca = TascaDAO.encuentraTascaPorID(session, entrada);
-            System.out.print("Fecha de inicio (xx/xx/xxxx)> ");
-            String fechaInicio = entrada.readLine();
-            System.out.print("Fecha final (xx/xx/xxxx)> ");
-            String fechaFinal = entrada.readLine();
+            System.out.println("formato: (dd/mm/yyyy o dd-mm-yyyy)");
+            String fechaInicio = solicitaYValidaFecha(entrada, "fecha inicio> ");
+            String fechaFinal = solicitaYValidaFecha(entrada, "fecha final> ");
             
             Historic historic = new Historic(fechaInicio, fechaFinal, tasca);
-            
             session.persist(historic);
+            tasca.addhsitoric(historic);
             session.getTransaction().commit();
-            System.out.println("Histórico creada con éxito.");
+            printScreen(terminal, "Histórico creada con éxito.");
         } catch (HibernateException e) {
             if (session.getTransaction() != null) session.getTransaction().rollback();
             System.out.println("Error Hibernate: "+ e.getMessage());
@@ -93,14 +101,14 @@ public class HistoricDAO {
         }
     }
 
-    public static void consultaHistoric(SessionFactory sf, BufferedReader entrada) throws IOException{
+    public static void consultaHistoric(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try {
             session = sf.openSession();
             if (!muestrasAllHistorics(session)) return;
             Historic historic = encuentraHistoricPorID(session, entrada);
-    
-            System.out.println("\n Histórico encontrado: " + historic.toString());
+            printScreen(terminal, "\nHistórico encontrado: " + historic.toString());
     
         } catch (HibernateException e) {
             if (session.getTransaction() != null) session.getTransaction().rollback();
@@ -113,7 +121,8 @@ public class HistoricDAO {
         }
     }
     
-    public static void modificaHistoric(SessionFactory sf, BufferedReader entrada) throws IOException {
+    public static void modificaHistoric(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try{
             session = sf.openSession();
@@ -124,14 +133,15 @@ public class HistoricDAO {
             boolean opcionValida = false;
             String opcion;
     
-            System.out.println("""
+            String escogeAtributos ="""
     
                     ¿Qué atributo desea modificar?
                     1. Fecha de inicio
                     2. Fecha final
                     3. Tasca
                     4. (Modifcar todos)
-                    """);
+                    """;
+            printScreen(terminal, escogeAtributos);
     
             while (!opcionValida) {
                 System.out.print("Opción: ");
@@ -139,12 +149,12 @@ public class HistoricDAO {
                 if (opcion.isEmpty()) continue;
                 switch (opcion) {
                     case "1":
-                        System.out.print("Fecha de inicio (xx/xx/xxxx)> ");
+                        System.out.print("Fecha de inicio> ");
                         historic.setDataInici(entrada.readLine());    
                         opcionValida = true;
                         break;
                     case "2":
-                        System.out.print("Fecha final (xx/xx/xxxx)> ");
+                        System.out.print("Fecha final> ");
                         historic.setDataFi(entrada.readLine());
                         opcionValida = true;
                         break;
@@ -156,9 +166,9 @@ public class HistoricDAO {
                         opcionValida = true;
                         break;
                     case "4":
-                        System.out.print("Fecha de inicio (xx/xx/xxxx)> ");
+                        System.out.print("Fecha de inicio> ");
                         historic.setDataInici(entrada.readLine());   
-                        System.out.print("Fecha final (xx/xx/xxxx)> ");
+                        System.out.print("Fecha final> ");
                         historic.setDataFi(entrada.readLine());
                         System.out.print("Ingresa la ID de Tasca que desea reemplazar:");
                         TascaDAO.muestrasAllTascas(session);
@@ -167,13 +177,13 @@ public class HistoricDAO {
                         opcionValida = true;
                         break;
                     default:
-                        System.out.println("\nOpción incorrecta! Por favor, vuelva a intentarlo.\n");
+                       printScreen(terminal, "\nOpción incorrecta! Por favor, vuelva a intentarlo.\n");
                 }
             }
             session.merge(historic);
             session.getTransaction().commit();
             
-            System.out.println("Tasca modificado con éxito.");
+            printScreen(terminal, "Tasca modificado con éxito.");
         } catch(HibernateException e){
             if(session.getTransaction() != null) session.getTransaction().rollback();
             System.out.println("Error Hibernate: "+ e.getMessage());
@@ -185,7 +195,8 @@ public class HistoricDAO {
         }
     }
 
-    public static void eliminaHistoric(SessionFactory sf, BufferedReader entrada) throws IOException {
+    public static void eliminaHistoric(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try {
             session = sf.openSession();
@@ -195,20 +206,20 @@ public class HistoricDAO {
 
             Historic historic = encuentraHistoricPorID(session, entrada);
     
-            System.out.println("Histórico encontrado.");
-            System.out.print("Está seguro de que quiere eliminarlo? (y / n): ");
+            printScreen(terminal, "Histórico encontrado.");
+            printScreen(terminal, "Está seguro de que quiere eliminarlo? (y / n): ");
 
             String respuesta = entrada.readLine();
             if (respuesta.equals("y")) {
                 session.remove(historic);
             } else {
-                System.out.println("Operación cancelada.");
+                printScreen(terminal, "Operación cancelada.");
                 return;
             }
     
             session.getTransaction().commit();
     
-            System.out.println("Hitórico eliminado con éxito.");
+            printScreen(terminal, "Hitórico eliminado con éxito.");
             
         } catch(HibernateException e){
             if(session.getTransaction() != null) session.getTransaction().rollback();
@@ -239,16 +250,17 @@ public class HistoricDAO {
         return historic;
     }
 
-    public static boolean muestrasAllHistorics(Session session) {
+    public static boolean muestrasAllHistorics(Session session)  throws IOException, InterruptedException{
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         try {
             Query<Historic> query = session.createQuery("from Historic", Historic.class);
             List<Historic> historics = query.list();
     
             if (historics.isEmpty()) {
-                System.out.println("No hay históricos registradas.");
+                printScreen(terminal, "No hay históricos registrados.");
                 return false;
             } else {
-                System.out.println("Históricos disponibles:");
+                printScreen(terminal, "Históricos disponibles:");
                 System.out.println();
                 for (Historic historic : historics) {
                     System.out.println(historic.toString());
@@ -262,4 +274,38 @@ public class HistoricDAO {
         return false;
     }
 
+
+
+    /*
+     * 
+     * VALIDACIÓN DE VARIABLES
+     * 
+     */
+
+
+
+    // Solicita y valida el fecha
+    private static String solicitaYValidaFecha(BufferedReader entrada, String tipoFecha) throws IOException {
+        String fecha = "";
+        
+        while (true) {
+            System.out.print(tipoFecha);
+            fecha = entrada.readLine();
+            if (fecha.matches("^([0-2][0-9]|3[01])[-/](0[1-9]|1[0-2])[-/]\\d{4}$")) {
+                break;
+            } else {
+                System.out.println("Error: Fecha no válida. Debe ser en formato dd/mm/yyyy o dd-mm-yyyy.");
+            }
+        }
+        return fecha;
+    }
+
+    private static void printScreen(Terminal terminal, String message) throws InterruptedException {
+        for (char c : message.toCharArray()) {
+            terminal.writer().print(c);
+            terminal.flush();
+            Thread.sleep(10);
+        }
+        System.out.println();
+    }
 }

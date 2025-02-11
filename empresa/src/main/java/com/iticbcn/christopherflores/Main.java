@@ -3,11 +3,11 @@ package com.iticbcn.christopherflores;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import org.hibernate.Session;
+
 import org.hibernate.SessionFactory;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 
 public class Main {
@@ -15,6 +15,7 @@ public class Main {
         try (SessionFactory sf = HibernateUtil.getSessionFactory()) {
             try (BufferedReader entrada = new BufferedReader(new InputStreamReader(System.in))) {
                 muestraTablas();
+                Terminal terminal = TerminalBuilder.builder().dumb(true).build();
                 boolean confirma = true;
                 String opcion;
                 while (confirma) {
@@ -22,10 +23,6 @@ public class Main {
                     opcion = entrada.readLine().strip();
                     if (opcion.isEmpty()) continue;
                     switch (opcion) {
-                        case "0":
-                            cargaTablas(sf);
-                            muestraTablas();
-                            break;
                         case "1":
                             DepartamentDAO.opcionesDepartament(sf, entrada);
                             muestraTablas();
@@ -46,7 +43,7 @@ public class Main {
                             confirma = false;
                             break;
                         default:
-                            System.out.println("Opción incorrecta, por favor:");
+                            printScreen(terminal, "Opción incorrecta, por favor:");
                             muestraTablas();
                             break;
                     }
@@ -64,7 +61,6 @@ public class Main {
 
                 Elija que tabla desea gestionar:
 
-                0. (CARGAR TABLAS)
                 1. DEPARTAMENT
                 2. EMPLEAT
                 3. TASCA
@@ -74,43 +70,13 @@ public class Main {
                 """);
     }
 
-    public static void cargaTablas(SessionFactory sf) {
-        Session session = null;
-        try {
-            session = sf.openSession();
-            session.beginTransaction();
-    
-            // Cargar el script SQL desde resources/db_scripts/insertsTablas.sql
-            InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("db_scripts/insertsTablas.sql");
-    
-            if (inputStream == null) {
-                throw new IOException("No se pudo encontrar el archivo insertsTablas.sql en resources/db_scripts.");
-            }
-    
-            String sql = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-    
-            // Separar las sentencias por punto y coma
-            String[] queries = sql.split(";");
-    
-            for (String query : queries) {
-                if (!query.trim().isEmpty()) {
-                    session.createNativeMutationQuery(query).executeUpdate();
-                }
-            }
-    
-            session.getTransaction().commit();
-            System.out.println("Tablas cargadas con éxito.");
-    
-        } catch (Exception e) {
-            if (session != null && session.getTransaction().isActive()) {
-                session.getTransaction().rollback();
-            }
-            System.out.println("Error al cargar las tablas: " + e.getMessage());
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+    private static void printScreen(Terminal terminal, String message) throws InterruptedException {
+        for (char c : message.toCharArray()) {
+            terminal.writer().print(c);
+            terminal.flush();
+            Thread.sleep(10);
         }
-    }    
+        System.out.println();
+    }
 }
 

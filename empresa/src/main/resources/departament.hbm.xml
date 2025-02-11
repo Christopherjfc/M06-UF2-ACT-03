@@ -5,8 +5,8 @@
         <id column="idDepartament" name="idDepartament" type="int">
             <generator class="identity"/>
         </id>
-        <property column="nomDepartament" name="nomDepartament" type="string" unique="true"/>
-        <set name="empleats" inverse="true" cascade="persist" fetch="lazy">
+        <property column="nomDepartament" name="nomDepartament" type="string" unique="true" not-null="true"/>
+        <set name="empleats" inverse="true" cascade="all" fetch="lazy">
             <key column="idDepartament"/>
             <one-to-many class="com.iticbcn.christopherflores.model.Empleat"/>
         </set>

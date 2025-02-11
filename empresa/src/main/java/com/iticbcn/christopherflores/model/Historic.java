@@ -14,9 +14,9 @@ public class Historic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idHistoric;
-    @Column
+    @Column(nullable = false)
     private String dataInici;
-    @Column
+    @Column(nullable = false)
     private String dataFi;
     
     @ManyToOne

@@ -18,12 +18,12 @@ public class Tasca {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idTasca;
-    @Column
+    @Column(nullable = false)
     private String nomTasca;
-    @Column
+    @Column(nullable = false)
     private String descripcio;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY,mappedBy = "tasca")
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "tasca")
     private Set<Empleat> empleat = new HashSet<>();
 
     @OneToMany 
@@ -42,6 +42,10 @@ public class Tasca {
             this.empleat.add(empleat);
         }
         empleat.getTasca().add(this);
+    }
+
+    public void addhsitoric(Historic historic){
+        historics.add(historic);
     }
 
     public int getIdTasca() {

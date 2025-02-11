@@ -8,6 +8,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 import com.iticbcn.christopherflores.model.Empleat;
 import com.iticbcn.christopherflores.model.Tasca;
@@ -16,6 +18,7 @@ public class TascaDAO {
     
     public static void opcionesTasca(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
         muestraOpciones();
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         boolean confirma = true;
         while (confirma) {
             System.out.print("CJ_HIBERNATE> ");
@@ -30,21 +33,23 @@ public class TascaDAO {
                     consultaTasca(sf, entrada);
                     muestraOpciones();
                     break;
-                case "3":
+                    case "3":
                     modificaTasca(sf, entrada);
                     muestraOpciones();
                     break;
-                case "4":
+                    case "4":
                     eliminaTasca(sf, entrada);
                     muestraOpciones();
-                case "5":
+                    break;
+                    case "5":
                     insertarEmpleat(sf, entrada);
+                    muestraOpciones();
                     break;
                 case "q":
                     confirma = false;
                     break;
                 default:
-                    System.out.println("Opción incorrecta, por favor:");
+                    printScreen(terminal, "Opción incorrecta, por favor:");
                     muestraOpciones();
                     break;
             }
@@ -54,8 +59,10 @@ public class TascaDAO {
 
     public static void muestraOpciones() {
         System.out.println("""
-
-        TABLA TASCA:
+            
+        -------------
+         TABLA TASCA
+        -------------
 
         1. CREA UN TASCA
         2. ENCUENTRA TASCA
@@ -68,18 +75,17 @@ public class TascaDAO {
     }
 
     public static void registraTasca(SessionFactory sf, BufferedReader entrada) throws IOException{
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try {
             session = sf.openSession();
             session.beginTransaction();
-            System.out.print("Título> ");
-            String nomTasca = entrada.readLine();
-            System.out.print("Descripción> ");
-            String descTasca = entrada.readLine();
+            String nomTasca = solicitaYValidaTitulo(entrada);
+            String descTasca = solicitaYValidaDescripcion(entrada);
             Tasca tasca = new Tasca(nomTasca, descTasca);
             session.persist(tasca);
             session.getTransaction().commit();
-            System.out.println("Tarea creada con éxito.");
+            printScreen(terminal, "Tarea creada con éxito.");
         } catch (HibernateException e) {
             if (session.getTransaction() != null) session.getTransaction().rollback();
             System.out.println("Error Hibernate: "+ e.getMessage());
@@ -92,12 +98,13 @@ public class TascaDAO {
     }
 
     public static void consultaTasca(SessionFactory sf, BufferedReader entrada) throws IOException{
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try {
             session = sf.openSession();
             if (!muestrasAllTascas(session)) return;
             Tasca tasca = encuentraTascaPorID(session, entrada);
-            System.out.println("\n Tarea encontrada: " + tasca.toString());
+            printScreen(terminal, "\nTarea encontrada: " + tasca.toString());
         } catch (HibernateException e) {
             if (session.getTransaction() != null) session.getTransaction().rollback();
             System.out.println("Error Hibernate: "+ e.getMessage());
@@ -110,6 +117,7 @@ public class TascaDAO {
     }
 
     public static void modificaTasca(SessionFactory sf, BufferedReader entrada) throws IOException {
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try{
             session = sf.openSession();
@@ -120,44 +128,41 @@ public class TascaDAO {
             boolean opcionValida = false;
             String opcion;
 
-            System.out.println("""
+            String escogeAtributos ="""
 
                     ¿Qué atributo desea modificar?
                     1. Título
                     2. Descripción
                     3. (Modifcar todos)
-                    """);
+                    """;
 
+            printScreen(terminal, escogeAtributos);
             while (!opcionValida) {
                 System.out.print("Opción: ");
                 opcion = entrada.readLine().strip();
                 if (opcion.isEmpty()) continue;
                 switch (opcion) {
                     case "1":
-                        System.out.print("Nuevo título: ");
-                        tasca.setNomTasca(entrada.readLine());    
+                        tasca.setNomTasca(solicitaYValidaTitulo(entrada));    
                         opcionValida = true;
                         break;
                     case "2":
-                        System.out.print("Nuevo título: ");
-                        tasca.setDescripcio(entrada.readLine());
+                        tasca.setDescripcio(solicitaYValidaDescripcion(entrada));
                         opcionValida = true;
                         break;
                     case "3":
-                        System.out.print("Nuevo título: ");
-                        tasca.setNomTasca(entrada.readLine()); 
-                        System.out.print("Nuevo título: ");
-                        tasca.setDescripcio(entrada.readLine());
+                        tasca.setNomTasca(solicitaYValidaTitulo(entrada));    
+                        tasca.setDescripcio(solicitaYValidaDescripcion(entrada));
                         opcionValida = true;
                         break;
                     default:
-                        System.out.println("\nOpción incorrecta! Por favor, vuelva a intentarlo.\n");
+                        printScreen(terminal, "\nOpción incorrecta! Por favor, vuelva a intentarlo.\n");
                 }
             }
             session.merge(tasca);
             session.getTransaction().commit();
             
-            System.out.println("Tasca modificado con éxito.");
+            printScreen(terminal, "Tasca modificado con éxito.");
         } catch(HibernateException e){
             if(session.getTransaction() != null) session.getTransaction().rollback();
             System.out.println("Error Hibernate: "+ e.getMessage());
@@ -170,6 +175,7 @@ public class TascaDAO {
     }
     
     public static void eliminaTasca(SessionFactory sf, BufferedReader entrada) throws IOException {
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try {
             session = sf.openSession();
@@ -179,21 +185,20 @@ public class TascaDAO {
 
             Tasca tasca = encuentraTascaPorID(session, entrada);
     
-            System.out.println("Tarea encontrada.");
-            System.out.print("Está seguro de que quiere eliminarlo? (y / n): ");
+            printScreen(terminal, "Tarea encontrada.");
+            printScreen(terminal, "Está seguro de que quiere eliminarla? (y / n): ");
 
             String respuesta = entrada.readLine();
             if (respuesta.equals("y")) {
                 session.remove(tasca);
+                printScreen(terminal, "Tarea eliminada con éxito.");
             } else {
-                System.out.println("Operación cancelada.");
+                printScreen(terminal, "Operación cancelada.");
                 return;
             }
     
             session.getTransaction().commit();
     
-            System.out.println("Tarea eliminada con éxito.");
-            
         } catch(HibernateException e){
             if(session.getTransaction() != null) session.getTransaction().rollback();
             System.out.println("Error Hibernate: "+ e.getMessage());
@@ -206,23 +211,27 @@ public class TascaDAO {
     }
 
     public static void insertarEmpleat(SessionFactory sf, BufferedReader entrada) throws IOException{
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
         try {
             session = sf.openSession();
             session.beginTransaction();
-            muestrasAllTascas(session);
-            System.out.println("Seleccione la tarea a la que desea añadirle una empleado:");
+            if (!muestrasAllTascas(session)) return;
+            printScreen(terminal, "Seleccione la tarea a la que desea añadirle una empleado:");
             Tasca tasca = encuentraTascaPorID(session, entrada);
-            EmpleatDAO.muestrasAllEmpleats(session);
-            System.out.println("Seleccione el empleado que desea añadirle a la tarea " + tasca.getNomTasca());
+            if (!EmpleatDAO.muestrasAllEmpleats(session)) {
+                System.out.println("Cree un empleado para poder asignarla a una Tarea.");
+                return;
+            }
+            printScreen(terminal, "Seleccione el empleado que desea añadirle a la tarea " + tasca.getNomTasca());
 
             Empleat empleat = EmpleatDAO.encuentraEmpleatPorID(session, entrada);
 
-            System.out.println("Insertando Empleado....");
+            printScreen(terminal, "Insertando Empleado....");
 
             empleat.getTasca().add(tasca);
 
-            System.out.println("Empleado asignado con éxito.");
+            printScreen(terminal, "Empleado asignado con éxito.");
             session.getTransaction().commit();
         } catch (HibernateException e) {
             if (session.getTransaction() != null) session.getTransaction().rollback();
@@ -254,16 +263,17 @@ public class TascaDAO {
         return tasca;
     }
 
-    public static boolean muestrasAllTascas(Session session) {
+    public static boolean muestrasAllTascas(Session session) throws IOException, InterruptedException{
+        Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         try {
             Query<Tasca> query = session.createQuery("from Tasca", Tasca.class);
             List<Tasca> tascas = query.list();
     
             if (tascas.isEmpty()) {
-                System.out.println("No hay tareas registradas.");
+                printScreen(terminal, "No hay tareas registradas.");
                 return false;
             } else {
-                System.out.println("Tareas disponibles:");
+                printScreen(terminal, "Tareas disponibles:");
                 System.out.println();
                 for (Tasca tasca : tascas) {
                     System.out.println(tasca.toString());
@@ -275,5 +285,48 @@ public class TascaDAO {
             System.out.println("Error Hibernate: " + e.getMessage());
         }
         return false;
+    }
+
+
+
+    /*
+     * 
+     * VALIDACIÓN DE VARIABLES
+     * 
+     */
+
+    // Solicita y valida el título
+    private static String solicitaYValidaTitulo(BufferedReader entrada) throws IOException {
+        System.out.print("Título> ");
+        String titulo = entrada.readLine().strip();
+    
+        while (titulo.isBlank()) {
+            System.out.println("Error: El título no puede estar vacío");
+            System.out.print("Título> ");
+            titulo = entrada.readLine();
+        }
+        return titulo;
+    }
+
+    // Solicita y valida la descripción
+    private static String solicitaYValidaDescripcion(BufferedReader entrada) throws IOException {
+        System.out.print("Descripción> ");
+        String descripcion = entrada.readLine().strip();
+
+        while (descripcion.isBlank()) {
+            System.out.println("Error: La descripción no puede estar vacía.");
+            System.out.print("Descripción> ");
+            descripcion = entrada.readLine();
+        }
+        return descripcion;
+    }
+
+    private static void printScreen(Terminal terminal, String message) throws InterruptedException {
+        for (char c : message.toCharArray()) {
+            terminal.writer().print(c);
+            terminal.flush();
+            Thread.sleep(10);
+        }
+        System.out.println();
     }
 }

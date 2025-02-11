@@ -15,23 +15,24 @@
         <property name="connection.username">root</property>
         <property name="connection.password">12345</property>
 
-        <!--  dialecto dentro del conector. Importante para claves ajenas-->
+        <!-- Dialecto dentro del conector. Importante para claves ajenas -->
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 
         <!-- Configuraciones adicionales -->
 
-        <!-- JDBC connection pool Conexiones concurrentes -->
+        <!-- JDBC connection pool (Conexiones concurrentes) -->
         <property name="connection.pool_size">5</property>
 
-        <!-- Una sesion de trabajo por Thread-->
+        <!-- Una sesión de trabajo por Thread -->
         <property name="current_session_context_class">thread</property>
 
+        <!-- Desactivar logs de Hibernate -->
+        <property name="show_sql">false</property>
+        <property name="hibernate.format_sql">false</property>
+        <property name="hibernate.use_sql_comments">false</property>
 
-        <!-- Informa de las operaciones "reales" SQL. Interesante en desarrollo -->
-        <property name="show_sql">true</property>
 
         <!-- Mantenimiento de la BBDD -->
-
         <property name="hbm2ddl.auto">update</property>
 
         <!-- opciones de hbm2dll:
@@ -47,6 +48,6 @@
         <mapping class="com.iticbcn.christopherflores.model.Empleat"/>
         <mapping class="com.iticbcn.christopherflores.model.Tasca"/>
         <mapping class="com.iticbcn.christopherflores.model.Historic"/>
-      
+
     </session-factory>
 </hibernate-configuration>
