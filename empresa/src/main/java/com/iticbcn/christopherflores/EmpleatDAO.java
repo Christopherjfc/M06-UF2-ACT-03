@@ -150,13 +150,14 @@ public class EmpleatDAO {
     public static void modificaEmpleat(SessionFactory sf, BufferedReader entrada) throws IOException, InterruptedException {
         Terminal terminal = TerminalBuilder.builder().dumb(true).build();
         Session session = null;
+        Empleat empleat = null;
         try {
             session = sf.openSession();
             session.beginTransaction();
 
             if (!muestrasAllEmpleats(session)) return;
     
-            Empleat empleat = encuentraEmpleatPorID(session, entrada);
+            empleat = encuentraEmpleatPorID(session, entrada);
             printScreen(terminal, "Empleado encontrado.");
             boolean opcionValida = false;
             String opcion;
@@ -228,14 +229,14 @@ public class EmpleatDAO {
     
         } catch (ConstraintViolationException cve) {
             if (session.getTransaction() != null) session.getTransaction().rollback();
-            String errorMessage = cve.getMessage().toLowerCase();
+            String errorMessage = cve.getMessage();
             
             // Determinar qué campo causó el error (dni, correu, telefon)
-            if (errorMessage.contains("dni")) {
+            if (errorMessage.contains(empleat.getDni())) {
                 printScreen(terminal, "Error: Ya existe un empleado con el mismo DNI.");
-            } else if (errorMessage.contains("correu")) {
+            } else if (errorMessage.contains(empleat.getCorreu())) {
                 printScreen(terminal, "Error: Ya existe un empleado con el mismo Correo.");
-            } else if (errorMessage.contains("telefon")) {
+            } else if (errorMessage.contains(empleat.getTelefon())) {
                 printScreen(terminal, "Error: Ya existe un empleado con el mismo Teléfono.");
             }
         } catch (Exception e) {

@@ -1,6 +1,6 @@
 # M06-UF2-ACT-03
 
-> **Nota:** ejecute **chcp 65001** en su consola para habilitar el UTF-8 temporalmente (si no lo tenía activado)
+> **Nota:** ejecute **chcp 65001** en la consola donde se ejecutará el programa para habilitar el UTF-8 temporalmente (si no lo tenía activado)
 
 # Main
 
@@ -232,7 +232,60 @@ Prueba de creación, empleado con ID=1 y tarea con ID=1:
 
 - **EXCEPTION DUPLICATE**
 
+Estos tres primeros casos, manejaré la excepción de valores duplicados en las tablas. Comenzando con las columnas duplicadas al crear nuevos registros. Como ejemplo en la creación y en la modificación pondré al empleado con ID = 1:
 
+<div>
+  <img src="img/empleat/duplicate/Empleado_referencia.png" alt="Promt Empleat" width="700"> 
+</div>
+<br>
+
+
+**CREACIÓN** <br>
+
+Si intento crear un empleado con el mismo DNI que el empleado de referencia que es **"12345678A"**, se maneja el error lanzando un mensaje de error personalizado cuando se detecta una duplicación, en este caso el DNI.
+
+<div>
+  <img src="img/empleat/duplicate/CreaDni.png" alt="Promt Empleat" width="700"> 
+</div>
+<br>
+
+Si intento crear un empleado con el mismo correo que el empleado de referencia que es **"juan.perez@email.com"**, se maneja el error lanzando un mensaje de error personalizado cuando se detecta una duplicación, en este caso el Correo.
+
+<div>
+  <img src="img/empleat/duplicate/CreaCorreo.png" alt="Promt Empleat" width="700"> 
+</div>
+<br>
+
+Si intento crear un empleado con el mismo teléfono que el empleado de referencia que es **"654321987"**, se maneja el error lanzando un mensaje de error personalizado cuando se detecta una duplicación, en este caso el teléfono.
+
+<div>
+  <img src="img/empleat/duplicate/CreaTelefono.png" alt="Promt Empleat" width="700"> 
+</div>
+<br>
+
+**MODIFICACIÓN** <br>
+
+A la hora de modificar una columna, ocurre lo mismo, si la modificación que se hace interfiere con una columna que tiene una constraint unique, lanzará un mensaje de error personalizado cuando se detecta una duplicación, en este caso el DNI.
+
+
+<div>
+  <img src="img/empleat/duplicate/ModificaDni.png" alt="Promt Empleat" width="700"> 
+</div>
+<br>
+
+Si intento cambiar el correo de un empleado al correo del empleado de referencia, lanzará un mensaje de error personalizado cuando se detecta una duplicación, en este caso el correo.
+
+<div>
+  <img src="img/empleat/duplicate/ModificaCorreo.png" alt="Promt Empleat" width="700"> 
+</div>
+<br>
+
+Si intento cambiar el teléfono de un empleado al teléfono del empleado de referencia, lanzará un mensaje de error personalizado cuando se detecta una duplicación, en este caso el teléfono.
+
+<div>
+  <img src="img/empleat/duplicate/ModificaTelefono.png" alt="Promt Empleat" width="700"> 
+</div>
+<br>
 
 <br>
 
