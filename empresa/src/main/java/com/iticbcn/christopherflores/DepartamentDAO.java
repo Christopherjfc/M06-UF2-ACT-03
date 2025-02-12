@@ -148,6 +148,14 @@ public class DepartamentDAO {
             Departament departament = encuentraDepartamentPorID(session, entrada);
     
             printScreen(terminal, "Departamento encontrado.");
+
+            printScreen(terminal, "Comprobando que el departamento encontrado no esté asociado a un Empleado...");
+
+            if (hayDepEnEmpleado(sf, departament.getIdDepartament()) == 1) {
+                printScreen(terminal, "No se puede eliminar el departamento porque tiene empleados asociados.");
+                return;
+            }
+
             printScreen(terminal, "Está seguro de que quiere eliminarlo? (y / n): ");
 
             String respuesta = entrada.readLine();
@@ -241,5 +249,28 @@ public class DepartamentDAO {
             Thread.sleep(10);
         }
         System.out.println();
-    }  
+    }
+    
+    public static int hayDepEnEmpleado(SessionFactory sf, int idDepartament) {
+        Session session = null;
+        int resultado = 0;
+        try {
+            session = sf.openSession();
+            String hql = "SELECT COUNT(e) FROM Empleat e WHERE e.departament.idDepartament = :idDepartament";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("idDepartament", idDepartament);
+            Long count = query.uniqueResult();
+            
+            if (count != null && count > 0) {
+                resultado = 1; // Hay empleados asociados
+            }
+        } catch (HibernateException e) {
+            System.out.println("Error Hibernate: " + e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return resultado;
+    }    
 }

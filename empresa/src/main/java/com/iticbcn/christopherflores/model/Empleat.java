@@ -41,7 +41,6 @@ public class Empleat {
     // MUCHOS EMPLEADOS -> TIENEN SOLO 1 -> DEPARTAMENTO 
     @ManyToOne
     @JoinColumn(name = "idDepartament", foreignKey = @ForeignKey(name = "FK_EMPL_DEPARTAMENT"), nullable = true)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Departament departament;
 
     @ManyToMany

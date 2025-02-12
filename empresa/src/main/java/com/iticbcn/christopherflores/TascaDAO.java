@@ -186,6 +186,14 @@ public class TascaDAO {
             Tasca tasca = encuentraTascaPorID(session, entrada);
     
             printScreen(terminal, "Tarea encontrada.");
+
+            printScreen(terminal, "Comprobando que la tarea encontrada no esté asociada a un Histórico...");
+
+            if (hayTareaEnHistoric(sf, tasca.getIdTasca()) == 1) {
+                printScreen(terminal, "No se puede eliminar la tarea porque tiene Históricos asociados.");
+                return;
+            }
+
             printScreen(terminal, "Está seguro de que quiere eliminarla? (y / n): ");
 
             String respuesta = entrada.readLine();
@@ -329,4 +337,27 @@ public class TascaDAO {
         }
         System.out.println();
     }
+
+    public static int hayTareaEnHistoric(SessionFactory sf, int idTasca) {
+        Session session = null;
+        int resultado = 0;
+        try {
+            session = sf.openSession();
+            String hql = "SELECT COUNT(h) FROM Historic h WHERE h.tasca.idTasca = :idTasca";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("idTasca", idTasca);
+            Long count = query.uniqueResult();
+            
+            if (count != null && count > 0) {
+                resultado = 1; // Hay tareas asociadas
+            }
+        } catch (HibernateException e) {
+            System.out.println("Error Hibernate: " + e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return resultado;
+    }    
 }

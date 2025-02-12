@@ -72,6 +72,15 @@ Si la respuesta es **"n"** como en este caso, se cancelará la eliminación del 
 </div>
 <br>
 
+ELIMINANDO DEPARTAMENTO ASOCIADO A UN EMPLEADO
+
+Si un empleado tiene asignado un departamento y este departamento se quiere eliminar, se mostrará un mensaje diciendo que no se puede eliminar un departamento que esté asociado a un empleado.
+
+<div>
+  <img src="img/departament/depAsociadoEmpl.png" alt="Remove cancelado" width="600"> 
+</div>
+<br>
+
 - **EXCEPTION DUPLICATE**
 
 > **Nota:** logré manejar la excepción de duplicado, pero no pude desaparecer el log de Error de duplicado del sqlExceptionHelper por consola.
@@ -185,6 +194,7 @@ Por último, para mostrar una prueba de los cambios, selecciono la opción de en
 <br>
 
 - **REMOVE**
+
 Al escoger la opción de eliminar, se llama a 2 métodos, uno que muestra todos los empleados existentes y otro que escoge un empleado por su ID.
 
 Al escoger una ID existente, se le pedirá al usuario la confirmación para eliminar el empleado. <br> 
@@ -359,6 +369,15 @@ Si la respuesta es **"n"** como en este caso, se cancelará la eliminación de l
 
 <div>
     <img src="img/tasca/removeCancelada.png" alt="Promt Empleat" width="650"> 
+</div>
+<br>
+
+ELIMINANDO TASCA ASOCIADA A UN HISTÓRICO
+
+Si un histórico tiene asignado una tarea y esta tarea se quiere eliminar, se mostrará un mensaje diciendo que no se puede eliminar una tarea que esté asociada a un histórico.
+
+<div>
+  <img src="img/tasca/TascaAsociadaHistoric.png" alt="Remove cancelado" width="600"> 
 </div>
 <br>
 
